@@ -34,7 +34,7 @@ from curriculum.state.utils import StateCollection, SmartStateCollection
 from curriculum.envs.start_env import generate_starts, find_all_feasible_states
 from curriculum.envs.goal_start_env import GoalStartExplorationEnv
 from curriculum.envs.arm3d.arm3d_disc_env import Arm3dDiscEnv
-
+from curriculum.envs.arm3d.arm3d_move_peg_env import Arm3dMovePegEnv
 EXPERIMENT_TYPE = osp.basename(__file__).split('.')[0]
 
 
@@ -53,6 +53,16 @@ def run_task(v):
     report.add_text(format_dict(v))
 
     inner_env = normalize(Arm3dDiscEnv())
+    # @llx test render for env Arm3dDiscEnv
+    # for i in range(100000):
+    #     inner_env.step( np.random.rand(7) )
+    #     inner_env.render()
+
+    #@llx test algo and render for Arm3dMovePegEnv
+    # inner_env = normalize(Arm3dMovePegEnv())
+    # for i in range(100000):
+    #     inner_env.step( np.random.rand(2) )
+    #     inner_env.render()
 
     fixed_goal_generator = FixedStateGenerator(state=v['ultimate_goal'])
     fixed_start_generator = FixedStateGenerator(state=v['ultimate_goal'])
@@ -71,6 +81,7 @@ def run_task(v):
         terminate_env=True,
     )
     print(env.spec)
+
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
         hidden_sizes=(64, 64),
@@ -93,7 +104,6 @@ def run_task(v):
     all_feasible_starts = pickle.load(open(osp.join(config.PROJECT_PATH, load_dir, 'disc_all_feasible_states_min.pkl'), 'rb'))
     print("we have %d feasible starts" % all_feasible_starts.size)
 
-
     if v['smart_replay_buffer']:
         all_starts = SmartStateCollection(distance_threshold=v['coll_eps'],
                                           abs=v["smart_replay_abs"],
@@ -102,9 +112,24 @@ def run_task(v):
     else:
         all_starts = StateCollection(distance_threshold=v['coll_eps'])
     brownian_starts = StateCollection(distance_threshold=v['regularize_starts'])
+
+    # @llx test render for env Arm3dDiscEnv
+    # 此时的环境是正常的初始化，下面的代码片会让木板插在柱子上
+    # for i in range(100000):
+    #     env.step( np.random.rand(7) )
+    #     env.render()
+    # import pdb; pdb.set_trace()
+
     with env.set_kill_outside():
         seed_starts = generate_starts(env, starts=[v['start_goal']], horizon=10,  # this is smaller as they are seeds!
                                       variance=v['brownian_variance'], subsample=v['num_new_starts'])  # , animated=True, speedup=1)
+    
+    # @llx test render for env Arm3dDiscEnv
+    # 上一段代码，会导致此处的agent将木板插在柱子上
+    # for i in range(100000):
+    #     env.step( np.random.rand(7) )
+    #     env.render()
+    # import pdb; pdb.set_trace()
 
     # with env.set_kill_outside():
     #     find_all_feasible_states(env, seed_starts, distance_threshold=0.1, brownian_variance=1, animate=False)
@@ -149,7 +174,7 @@ def run_task(v):
                 n_itr=v['inner_iters'],
                 step_size=0.01,
                 discount=v['discount'],
-                plot=False,
+                plot=True,
             )
 
             trpo_paths = algo.train()

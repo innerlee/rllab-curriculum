@@ -93,7 +93,8 @@ class MujocoEnv(Env):
             self.init_qpos = init_qpos
         self.dcom = None
         self.current_com = None
-        self.reset()
+        # import pdb; pdb.set_trace()
+        # self.reset()
         super(MujocoEnv, self).__init__()
 
     @property
@@ -159,6 +160,7 @@ class MujocoEnv(Env):
         cdists = np.copy(self.model.geom_margin).flat
         for c in self.model.data.contact:
             cdists[c.geom2] = min(cdists[c.geom2], c.dist)
+        import pdb;pdb.set_trace()
         obs = np.concatenate([
             data.qpos.flat,
             data.qvel.flat,
@@ -210,9 +212,11 @@ class MujocoEnv(Env):
         self.dcom = new_com - self.current_com
         self.current_com = new_com
 
-    def get_viewer(self, config=None):
+    def get_viewer(self, visible=True, config=None):
         if self.viewer is None:
-            self.viewer = MjViewer()
+            # @llx
+            # fuck for mode == 'rgb_array' in render()
+            self.viewer = MjViewer(visible=visible)
             self.viewer.start()
             self.viewer.set_model(self.model)
         if config is not None:
@@ -224,30 +228,46 @@ class MujocoEnv(Env):
     def setup_camera(self, cam_pos=None, viewer = None):
         """Setup camera
         """
-        if cam_pos is None:
-            cam_pos = self._params["cam_pos"]
-        if viewer is None:
-            viewer = self._viewer
-        viewer.cam.lookat[0] = cam_pos[0]
-        viewer.cam.lookat[1] = cam_pos[1]
-        viewer.cam.lookat[2] = cam_pos[2]
-        viewer.cam.distance = cam_pos[3]
-        viewer.cam.elevation = cam_pos[4]
-        viewer.cam.azimuth = cam_pos[5]
+        # # if cam_pos is None:
+        # #     cam_pos = self._params["cam_pos"]
+        # if viewer is None:
+        #     viewer = self.get_viewer() #self._viewer
+        # @llx -  camera
+        viewer = self.get_viewer()
+        viewer.cam.lookat[0] = 0.0#0.0
+        viewer.cam.lookat[1] = 0.0#0.0
+        viewer.cam.lookat[2] = 0.0#0.0
+        viewer.cam.distance = 1.7960737961943236 #2.0
+        viewer.cam.elevation = 2.40000182390213#-45.0
+        viewer.cam.azimuth = -89.39999341964722#90.0
         viewer.cam.trackbodyid = -1
+        viewer.set_window_size(300,200)
+
+
+        # print(viewer.cam.lookat[0])
+        # print(viewer.cam.lookat[1])
+        # print(viewer.cam.lookat[2])
+        # print(viewer.cam.distance)
+        # print(viewer.cam.elevation)
+        # print(viewer.cam.azimuth)
+        # print(viewer.cam.trackbodyid)
+
 
     def render(self, close=False, mode='human', config=None):
+        # @llx -  camera
+        self.setup_camera()
         if mode == 'human':
             viewer = self.get_viewer(config=config)
             viewer.loop_once()
         elif mode == 'rgb_array':
-            viewer = self.get_viewer(config=config)
-            viewer.loop_once()
+            # # print(close)
+            viewer = self.get_viewer(visible= not close, config=config)
+            viewer.loop_once(close=close)
             # self.get_viewer(config=config).render()
             data, width, height = self.get_viewer(config=config).get_image()
+            if close:
+                self.stop_viewer()
             return np.fromstring(data, dtype='uint8').reshape(height, width, 3)[::-1,:,:]
-        if close:
-            self.stop_viewer()
 
     def start_viewer(self):
         viewer = self.get_viewer()

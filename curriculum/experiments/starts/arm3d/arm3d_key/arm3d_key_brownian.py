@@ -102,8 +102,7 @@ if __name__ == '__main__':
     # Launching
     print("\n" + "**********" * 10 + "\nexp_prefix: {}\nvariants: {}".format(exp_prefix, vg.size))
     print('Running on type {}, with price {}, parallel {} on the subnets: '.format(config.AWS_INSTANCE_TYPE,
-                                                                                   config.AWS_SPOT_PRICE, n_parallel),
-          *subnets)
+                                                                                   config.AWS_SPOT_PRICE, n_parallel), *subnets)
 
     for vv in vg.variants():
         if mode in ['ec2', 'local_docker']:
@@ -125,7 +124,9 @@ if __name__ == '__main__':
                     AssociatePublicIpAddress=True,
                 )
             ]
-
+            
+            # @llx
+            # run_task is the algorithm to train agent
             run_experiment_lite(
                 # use_cloudpickle=False,
                 stub_method_call=run_task,

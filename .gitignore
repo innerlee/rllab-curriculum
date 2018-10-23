@@ -43,12 +43,10 @@ rllab/config_personal.py
 *.sublime-project
 *.sublime-workspace
 *.bin
-*.sh
 MNIST/
 logs/
 *.html
 *.csv
-*.ipynb
 .remote-sync.json
 sandbox/rocky/exp_data
 __pycache__

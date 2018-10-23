@@ -308,8 +308,9 @@ class MjViewer(object):
     def should_stop(self):
         return glfw.window_should_close(self.window)
 
-    def loop_once(self):
-        self.render()
+    def loop_once(self,close=False):
+        if not close:
+            self.render()
         # Swap front and back buffers
         glfw.swap_buffers(self.window)
         # Poll for and process events

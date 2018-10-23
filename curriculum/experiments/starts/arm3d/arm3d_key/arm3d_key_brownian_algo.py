@@ -92,7 +92,7 @@ def run_task(v):
         n_itr=v['inner_iters'],
         step_size=0.01,
         discount=v['discount'],
-        plot=False,
+        plot=True,
     )
 
     # load the state collection from data_upload
@@ -115,6 +115,7 @@ def run_task(v):
 
     logger.log('Generating seed starts from the goal (horizon 10, subsample 600 of them)')
     with algo.env.set_kill_outside(radius=v['kill_radius']):
+        # import pdb; pdb.set_trace()
         seed_starts = generate_starts(env, starts=[v['start_goal']], horizon=10,  # this is smaller as they are seeds!
                                       variance=v['brownian_variance'],
                                       subsample=v['num_new_starts'])  # , animated=True, speedup=10)
@@ -159,6 +160,8 @@ def run_task(v):
             logger.log("Training the algorithm")
 
             algo.current_itr = 0
+            # @llx 
+            # there start to train, so the above codes are doing init.
             trpo_paths = algo.train(already_init=outer_iter > 1)
 
         # import pdb; pdb.set_trace()
