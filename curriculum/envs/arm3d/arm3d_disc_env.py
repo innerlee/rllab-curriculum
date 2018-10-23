@@ -22,6 +22,7 @@ class Arm3dDiscEnvllx(MujocoEnv, Serializable):
                  kill_radius=0.4,
                  stepNumMax = 300,
                  sparse1_dis=0.1,
+                 task2InitNoise=False,
                  *args, **kwargs):
         MujocoEnv.__init__(self, *args, **kwargs)
 
@@ -36,6 +37,7 @@ class Arm3dDiscEnvllx(MujocoEnv, Serializable):
         self.goalPostitionTask1 = None
         self.stepNumMax = stepNumMax #1111
         self.sparse1_dis=sparse1_dis
+        self.task2InitNoise = task2InitNoise
 
     @overrides
     def get_current_obs(self):
@@ -64,8 +66,9 @@ class Arm3dDiscEnvllx(MujocoEnv, Serializable):
     def reset(self, init_state=None, *args, **kwargs):
         # init_state = (0.387, 1.137, -2.028, -1.744, 2.029, -0.873, 1.55, 0, 0) # TODO: used for debugging only!
         # @llx-noise
-        if init_state:
-            init_state  += np.random.uniform(0,0.3,len(init_state))
+        if init_state and self.task2InitNoise:
+            init_state  += np.random.uniform(0,self.task2InitNoise,len(init_state))
+            print('add noise to task2'+str(self.task2InitNoise))
         ret = super(Arm3dDiscEnvllx, self).reset(init_state, *args, **kwargs)
         self.stepsNum = 0
         # self.current_goal = self.model.data.geom_xpos[-1][:2]
