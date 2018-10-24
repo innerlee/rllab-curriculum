@@ -68,7 +68,7 @@ class Arm3dDiscEnvllx(MujocoEnv, Serializable):
         # @llx-noise
         if init_state and self.task2InitNoise:
             init_state  += np.random.uniform(0,self.task2InitNoise,len(init_state))
-            print('add noise to task2'+str(self.task2InitNoise))
+            # print('add noise to task2'+str(self.task2InitNoise))
         ret = super(Arm3dDiscEnvllx, self).reset(init_state, *args, **kwargs)
         self.stepsNum = 0
         # self.current_goal = self.model.data.geom_xpos[-1][:2]

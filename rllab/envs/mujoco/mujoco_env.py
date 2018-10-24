@@ -216,9 +216,11 @@ class MujocoEnv(Env):
         if self.viewer is None:
             # @llx
             # fuck for mode == 'rgb_array' in render()
-            self.viewer = MjViewer(visible=visible)
+            # self.viewer = MjViewer(visible=visible)
+            self.viewer = MjViewer()
             self.viewer.start()
             self.viewer.set_model(self.model)
+            # self.setup_camera()
         if config is not None:
             self.viewer.set_window_pose(config["xpos"], config["ypos"])
             self.viewer.set_window_size(config["width"], config["height"])
@@ -241,7 +243,7 @@ class MujocoEnv(Env):
         viewer.cam.elevation = 2.40000182390213#-45.0
         viewer.cam.azimuth = -89.39999341964722#90.0
         viewer.cam.trackbodyid = -1
-        viewer.set_window_size(300,200)
+        # viewer.set_window_size(300,200)
 
 
         # print(viewer.cam.lookat[0])
@@ -253,21 +255,38 @@ class MujocoEnv(Env):
         # print(viewer.cam.trackbodyid)
 
 
+    # def render(self, close=False, mode='human', config=None):
+    #     # @llx -  camera
+    #     # print(mode)
+    #     # print(close)
+    #     # import time
+    #     # time.sleep(10)
+    #     # self.setup_camera()
+    #     if mode == 'human':
+    #         viewer = self.get_viewer(config=config)
+    #         viewer.loop_once()
+    #     elif mode == 'rgb_array':
+    #         # # print(close)
+    #         viewer = self.get_viewer(visible= not close, config=config)
+    #         viewer.loop_once(close=close)
+    #         # self.get_viewer(config=config).render()
+    #         data, width, height = self.get_viewer(config=config).get_image()
+    #         if close:
+    #             self.stop_viewer()
+    #         return np.fromstring(data, dtype='uint8').reshape(height, width, 3)[::-1,:,:]
+
     def render(self, close=False, mode='human', config=None):
-        # @llx -  camera
-        self.setup_camera()
         if mode == 'human':
             viewer = self.get_viewer(config=config)
             viewer.loop_once()
         elif mode == 'rgb_array':
-            # # print(close)
-            viewer = self.get_viewer(visible= not close, config=config)
-            viewer.loop_once(close=close)
+            viewer = self.get_viewer(config=config)
+            viewer.loop_once()
             # self.get_viewer(config=config).render()
             data, width, height = self.get_viewer(config=config).get_image()
-            if close:
-                self.stop_viewer()
             return np.fromstring(data, dtype='uint8').reshape(height, width, 3)[::-1,:,:]
+        if close:
+            self.stop_viewer()
 
     def start_viewer(self):
         viewer = self.get_viewer()

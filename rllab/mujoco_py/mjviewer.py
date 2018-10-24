@@ -28,8 +28,8 @@ class MjViewer(object):
         as you expect.
         """
         self.visible = visible
-        self.init_width = init_width
-        self.init_height = init_height
+        self.init_width = init_width#300
+        self.init_height = init_height#200
         self.go_fast = not visible or go_fast
 
         self.last_render_time = 0
