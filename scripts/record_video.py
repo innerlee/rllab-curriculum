@@ -3,7 +3,7 @@ import joblib
 from rllab import config
 import numpy as np
 import random
-from gym.monitoring.video_recorder import ImageEncoder
+from gym.monitoring.wrappers.video_recorder import ImageEncoder
 import tensorflow as tf
 import cv2
 from rllab.misc import console

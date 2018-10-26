@@ -28,8 +28,8 @@ class MjViewer(object):
         as you expect.
         """
         self.visible = visible
-        self.init_width = init_width#300
-        self.init_height = init_height#200
+        self.init_width = init_width
+        self.init_height = init_height
         self.go_fast = not visible or go_fast
 
         self.last_render_time = 0
@@ -308,9 +308,8 @@ class MjViewer(object):
     def should_stop(self):
         return glfw.window_should_close(self.window)
 
-    def loop_once(self,close=False):
-        if not close:
-            self.render()
+    def loop_once(self):
+        self.render()
         # Swap front and back buffers
         glfw.swap_buffers(self.window)
         # Poll for and process events
