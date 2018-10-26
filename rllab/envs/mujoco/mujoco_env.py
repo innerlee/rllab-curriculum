@@ -213,6 +213,7 @@ class MujocoEnv(Env):
     # I donnot konw why the code provide rgb_array mode and close option, but not give a way to close the windows by visible.
     # Maybe want to get a word fuck from development.
     def get_viewer(self, config=None, visible=True):
+        # TODO: Wrap the following hyper parameters (init with, weight and cam_pos )
         if self.viewer is None:
             self.viewer = MjViewer(visible=visible, init_width=300, init_height=200)
             self.viewer.start()
