@@ -210,12 +210,15 @@ class MujocoEnv(Env):
         self.dcom = new_com - self.current_com
         self.current_com = new_com
 
-    def get_viewer(self, config=None):
+    # I donnot konw why the code provide rgb_array mode and close option, but not give a way to close the windows by visible.
+    # Maybe want to get a word fuck from development.
+    def get_viewer(self, config=None, visible=True):
         if self.viewer is None:
-            self.viewer = MjViewer(visible=False, init_width=300, init_height=200)
+            self.viewer = MjViewer(visible=visible, init_width=300, init_height=200)
             self.viewer.start()
             self.viewer.set_model(self.model)
-            self.setup_camera(viewer=self.viewer)
+            self.setup_camera(viewer=self.viewer, \
+                 cam_pos = [0.0, 0.0, 0.0, 1.7960737961943236, 2.40000182390213, -89.39999341964722])
         if config is not None:
             self.viewer.set_window_pose(config["xpos"], config["ypos"])
             self.viewer.set_window_size(config["width"], config["height"])
@@ -225,16 +228,24 @@ class MujocoEnv(Env):
     def setup_camera(self, cam_pos=None, viewer = None):
         """Setup camera
         """
-        # if cam_pos is None:
-        #     cam_pos = self._params["cam_pos"]
+        # viewer.cam.lookat[0] = 0.0#0.0
+        # viewer.cam.lookat[1] = 0.0#0.0
+        # viewer.cam.lookat[2] = 0.0#0.0
+        # viewer.cam.distance = 1.7960737961943236 #2.0
+        # viewer.cam.elevation = 2.40000182390213#-45.0
+        # viewer.cam.azimuth = -89.39999341964722#90.0
+        # viewer.cam.trackbodyid = -1
+
+        if cam_pos is None:
+            cam_pos = self._params["cam_pos"]
         if viewer is None:
             viewer = self._viewer
-        viewer.cam.lookat[0] = 0.0#0.0
-        viewer.cam.lookat[1] = 0.0#0.0
-        viewer.cam.lookat[2] = 0.0#0.0
-        viewer.cam.distance = 1.7960737961943236 #2.0
-        viewer.cam.elevation = 2.40000182390213#-45.0
-        viewer.cam.azimuth = -89.39999341964722#90.0
+        viewer.cam.lookat[0] = cam_pos[0]
+        viewer.cam.lookat[1] = cam_pos[1]
+        viewer.cam.lookat[2] = cam_pos[2]
+        viewer.cam.distance = cam_pos[3]
+        viewer.cam.elevation = cam_pos[4]
+        viewer.cam.azimuth = cam_pos[5]
         viewer.cam.trackbodyid = -1
 
     def render(self, close=False, mode='human', config=None):
@@ -242,10 +253,10 @@ class MujocoEnv(Env):
             viewer = self.get_viewer(config=config)
             viewer.loop_once()
         elif mode == 'rgb_array':
-            viewer = self.get_viewer(config=config)
+            viewer = self.get_viewer(config=config, visible=False)
             viewer.loop_once()
             # self.get_viewer(config=config).render()
-            data, width, height = self.get_viewer(config=config).get_image()
+            data, width, height = self.get_viewer(config=config, visible=False).get_image()
             return np.fromstring(data, dtype='uint8').reshape(height, width, 3)[::-1,:,:]
         if close:
             self.stop_viewer()
